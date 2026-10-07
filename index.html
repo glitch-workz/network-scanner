@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head><title>Home Network Camera Scanner</title></head>
+<body>
+    <h2>Scanning your 192.168.69.X network...</h2>
+    <div id="results">Looking for active devices...<br></div>
+
+    <script>
+        const subnet = "192.168.69";
+        const resultsDiv = document.getElementById("results");
+
+        // Loop through all possible devices on your subnet (1 to 254)
+        for (let i = 1; i < 255; i++) {
+            const targetIP = `${subnet}.${i}`;
+            const startTime = performance.now();
+
+            // Try to fetch a tiny image or connection from the IP
+            fetch(`http://${targetIP}:80`, { mode: 'no-cors' })
+            .then(() => {
+                resultsDiv.innerHTML += `<b>FOUND ACTIVE DEVICE: ${targetIP}</b><br>`;
+            })
+            .catch(() => {
+                const duration = performance.now() - startTime;
+                // If a device exists but blocks the port, it responds faster than a dead IP timeout
+                if (duration < 1000) { 
+                    resultsDiv.innerHTML += `Potential Device Hidden At: ${targetIP}<br>`;
+                }
+            });
+        }
+    </script>
+</body>
+</html>
